@@ -1,0 +1,1 @@
+alter table ticket add column fk_related_project uuid references project (id);

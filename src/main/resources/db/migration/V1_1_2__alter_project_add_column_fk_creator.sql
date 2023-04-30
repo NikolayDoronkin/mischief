@@ -1,0 +1,1 @@
+alter table project add column fk_creator uuid references "user" (id);

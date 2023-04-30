@@ -1,0 +1,1 @@
+alter table ticket alter column description type varchar(1000)
