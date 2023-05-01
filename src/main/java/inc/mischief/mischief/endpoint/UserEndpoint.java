@@ -46,6 +46,17 @@ public class UserEndpoint {
 		return new ResponseEntity<>(userMapper.convert(userService.findAll()), HttpStatus.OK);
 	}
 
+	@SecurityRequirement(name = "Bearer Authentication")
+	@Operation(summary = "Получить пользователя по id")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "User founded",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = UserResponse.class))})})
+	@GetMapping("/{id}")
+	public ResponseEntity<UserResponse> getById(@PathVariable UUID id) {
+		return new ResponseEntity<>(userMapper.convert(userService.findById(id)), HttpStatus.OK);
+	}
+
 	@Transactional
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/current")

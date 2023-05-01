@@ -10,9 +10,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,10 @@ public class TicketService {
 		int maxNumberFromProject = Optional.ofNullable(ticketRepository.findMaxNumberFromProject(createdTicket.getRelatedProjectId())).orElse(0);
 		createdTicket.setNumber(++maxNumberFromProject);
 
+		if (createdTicket.getStatus() == TicketStatus.IN_PROGRESS) {
+			createdTicket.setStarted(LocalDate.now());
+		}
+
 		return ticketRepository.save(createdTicket);
 	}
 
@@ -57,9 +62,24 @@ public class TicketService {
 			throw new IllegalArgumentException("That status is not available: %s".formatted(updatedTicket.getStatus()));
 		}
 
+		checkDuration(ticket, updatedTicket);
+
 		ticketMapper.update(ticket, updatedTicket);
 
 		return ticketRepository.save(ticket);
+	}
+
+	private void checkDuration(Ticket ticket, Ticket updatedTicket) {
+		var currentStatus = ticket.getStatus();
+		var nextStatus = updatedTicket.getStatus();
+
+		if (currentStatus == TicketStatus.IN_PROGRESS && nextStatus == TicketStatus.DONE) {
+			ticket.setFinished(LocalDate.now());
+			ticket.setDuration(Duration.between(ticket.getStarted(), ticket.getFinished()).toDays());
+		}
+		else if (currentStatus != TicketStatus.IN_PROGRESS && nextStatus == TicketStatus.IN_PROGRESS) {
+			ticket.setDuration(ticket.getDuration() + Duration.between(ticket.getStarted(), LocalDate.now()).toDays());
+		}
 	}
 
 	@Transactional

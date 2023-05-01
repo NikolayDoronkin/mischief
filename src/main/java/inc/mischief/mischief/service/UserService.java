@@ -32,6 +32,13 @@ public class UserService {
 		return userRepository.findByIdIn(ids);
 	}
 
+	public User findById(UUID id) {
+		return userRepository.findByIdIn(Collections.singleton(id))
+				.stream()
+				.findFirst()
+				.orElseThrow(EntityExistsException::new);
+	}
+
 	public User create(User createdUser) {
 
 		checkExisting(userRepository.findByLogin(createdUser.getLogin()), "User with this login already exists!");

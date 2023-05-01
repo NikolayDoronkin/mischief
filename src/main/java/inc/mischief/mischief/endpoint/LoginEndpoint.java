@@ -4,6 +4,7 @@ import inc.mischief.mischief.configuration.jwt.JwtTokenProvider;
 import inc.mischief.mischief.model.request.user.LoginRequest;
 import inc.mischief.mischief.model.response.user.LoginResponse;
 import inc.mischief.mischief.repositories.UserRepository;
+import inc.mischief.mischief.service.CommentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceException;
@@ -29,6 +30,8 @@ public class LoginEndpoint {
 	private final UserRepository userRepository;
 	private final JwtTokenProvider jwtTokenProvider;
 
+	private final CommentService commentService;
+
 	@PostMapping(path = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
 		var expectedUser = Optional.ofNullable(userRepository.findByLogin(loginRequest.login()))
@@ -47,6 +50,6 @@ public class LoginEndpoint {
 
 	@GetMapping("/ping")
 	public String getHelloWorld() {
-		return "Hello World!";
+		return "Hello world!";
 	}
 }

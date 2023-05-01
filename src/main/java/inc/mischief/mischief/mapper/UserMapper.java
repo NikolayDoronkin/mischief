@@ -10,6 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,7 @@ public interface UserMapper {
 	User convert(UpdateUserRequest request);
 	UserResponse convert(User user);
 	List<UserResponse> convert(List<User> users);
+	Collection<UserResponse> convert(Collection<User> users);
 
 	void update(@MappingTarget User updatedUser, User userFromRequest);
 }

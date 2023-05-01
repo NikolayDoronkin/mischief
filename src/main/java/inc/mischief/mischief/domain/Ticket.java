@@ -8,6 +8,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,6 +63,15 @@ public class Ticket extends GenericEntity {
 	@Column(name = "fk_related_project", nullable = false)
 	private UUID relatedProjectId;
 
+	private LocalDate started;
+
+	private LocalDate finished;
+
+	private long duration;
+
+	@Column(nullable = false)
+	private int difficulty;
+
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private TicketType type;//Тип задачи
@@ -100,7 +110,7 @@ public class Ticket extends GenericEntity {
 	private Project relatedProject;// Проект, к которому относится задача
 
 	@OneToMany(mappedBy = "relatedTicket")
-	private Set<Comment> comments;//Комментарии
+	private List<Comment> comments;//Комментарии
 //	private Ticket rootTicket;// Подзадачи
 
 	public void setReporter(User reporter) {

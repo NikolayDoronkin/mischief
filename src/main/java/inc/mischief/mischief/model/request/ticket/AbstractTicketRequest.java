@@ -33,6 +33,8 @@ public abstract class AbstractTicketRequest {
 	@NotNull
 	private TicketPriority priorityName;
 
+	private int difficulty;
+
 	@NotNull
 	private TicketStatus status;
 

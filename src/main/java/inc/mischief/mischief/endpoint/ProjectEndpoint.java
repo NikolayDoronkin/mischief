@@ -1,7 +1,9 @@
 package inc.mischief.mischief.endpoint;
 
 import inc.mischief.mischief.configuration.jwt.JwtUser;
+import inc.mischief.mischief.domain.User;
 import inc.mischief.mischief.mapper.ProjectMapper;
+import inc.mischief.mischief.mapper.UserMapper;
 import inc.mischief.mischief.model.request.project.CreateProjectRequest;
 import inc.mischief.mischief.model.request.project.UpdateProjectRequest;
 import inc.mischief.mischief.model.response.project.ProjectResponse;
@@ -22,7 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -32,10 +36,33 @@ import java.util.UUID;
 @Tag(name = "Project", description = "Эндпоинты для работы с проектами")
 public class ProjectEndpoint {
 
+	private final UserMapper userMapper;
 	private final ProjectMapper projectMapper;
-	private final ProjectService projectService;
-	private final UserService userService;
 
+	private final UserService userService;
+	private final ProjectService projectService;
+
+	@Operation(summary = "Получить статистику по проекту")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = ProjectResponse.class))})})
+	@GetMapping("/{id}/statistics")
+	public ResponseEntity<Map<User, Double>> getStatistics(@AuthenticationPrincipal JwtUser currentUser,
+														   @PathVariable UUID id) {
+		return new ResponseEntity<>(projectService.getStatistics(id), HttpStatus.OK);
+	}
+
+	@Operation(summary = "Получить всех участников проекта")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = ProjectResponse.class))})})
+	@GetMapping("/{id}/members")
+	public ResponseEntity<Collection<UserResponse>> getMembers(@AuthenticationPrincipal JwtUser currentUser,
+															   @PathVariable UUID id) {
+		return new ResponseEntity<>(userMapper.convert(projectService.getMembersFromProject(id)), HttpStatus.OK);
+	}
 
 	@Operation(summary = "Создать клиента")
 	@ApiResponses(value = {
@@ -112,5 +139,15 @@ public class ProjectEndpoint {
 	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable UUID id) {
 		projectService.delete(id);
+	}
+
+	@Operation(summary = "Удалить участника из проекта")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "204", description = "No content",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = ResponseEntity.BodyBuilder.class))})})
+	@PostMapping("/delete/{projectId}/delete/{userId}")
+	public void delete(@PathVariable UUID projectId, @PathVariable UUID userId) {
+		projectService.deleteUserFromProject(projectId, userId);
 	}
 }

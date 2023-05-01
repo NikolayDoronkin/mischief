@@ -3,10 +3,12 @@ package inc.mischief.mischief.model.response.ticket;
 import inc.mischief.mischief.domain.enumeration.ticket.TicketPriority;
 import inc.mischief.mischief.domain.enumeration.ticket.TicketStatus;
 import inc.mischief.mischief.domain.enumeration.ticket.TicketType;
+import inc.mischief.mischief.model.response.comment.CommentResponse;
 import inc.mischief.mischief.model.response.project.ProjectResponse;
 import inc.mischief.mischief.model.response.user.UserResponse;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,6 +32,7 @@ public record TicketResponse(
 		TicketType type,
 		UUID parentTicketId,
 		Set<UserResponse> listeners,
+		int difficulty,
 		Set<UserResponse> accessableUsers
 ) {
 }

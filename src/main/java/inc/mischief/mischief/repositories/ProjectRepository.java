@@ -19,5 +19,12 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 			where um2mp.fk_user = ?1
 			""", nativeQuery = true)
 	List<UUID> findAllForUserByAccess(UUID userId);
+
 	List<Project> findAllByIdIn(Collection<UUID> projectIds);
+
+	@Query(value = """
+			select um2mp.fk_user from user_m2m_project um2mp
+			where um2mp.fk_project = ?1
+			""", nativeQuery = true)
+	List<UUID> findUserIds(UUID projectId);
 }

@@ -1,9 +1,6 @@
 package inc.mischief.mischief.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -20,8 +17,14 @@ import java.util.UUID;
 public class Comment extends GenericEntity {
 
 	@ManyToOne
-	@JoinColumn(name = "fk_author")
+	@JoinColumn(name = "fk_author", insertable = false, updatable = false)
 	private User author; //- Автор комментария
+
+	@Column(name = "fk_author", nullable = false)
+	private UUID authorId;
+
+	@Column(nullable = false)
+	private String value;
 
 	private LocalDate created; //- Дата создания
 	private LocalDate updated; //- Дата редактирования
@@ -35,4 +38,19 @@ public class Comment extends GenericEntity {
 	@ManyToOne
 	@JoinColumn(name = "fk_ticket")
 	private Ticket relatedTicket;
+
+	@PrePersist
+	public void setupFields() {
+		this.created = LocalDate.now();
+	}
+
+	@PreUpdate
+	public void updateFields() {
+		this.updated = LocalDate.now();
+	}
+
+	public void setRelatedTicket(Ticket relatedTicket) {
+		this.relatedTicket = relatedTicket;
+		this.relatedTicketId = relatedTicket != null ? relatedTicket.getId() : null;
+	}
 }
