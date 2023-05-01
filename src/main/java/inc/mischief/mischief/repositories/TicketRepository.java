@@ -10,6 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
+	List<Ticket> findByParentTicketId(UUID parentTicketId);
 	List<Ticket> findAllByRelatedProjectId(UUID projectId);
 	Ticket findTicketByRelatedProjectIdAndId(UUID projectId, UUID ticketId);
 

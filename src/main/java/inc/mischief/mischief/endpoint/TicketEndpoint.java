@@ -1,6 +1,9 @@
 package inc.mischief.mischief.endpoint;
 
 import inc.mischief.mischief.configuration.jwt.JwtUser;
+import inc.mischief.mischief.domain.enumeration.ticket.TicketPriority;
+import inc.mischief.mischief.domain.enumeration.ticket.TicketStatus;
+import inc.mischief.mischief.domain.enumeration.ticket.TicketType;
 import inc.mischief.mischief.mapper.TicketMapper;
 import inc.mischief.mischief.model.request.ticket.CreateTicketRequest;
 import inc.mischief.mischief.model.request.ticket.UpdateTicketRequest;
@@ -48,6 +51,20 @@ public class TicketEndpoint {
 				HttpStatus.CREATED);
 	}
 
+	@Operation(summary = "Получение дочерних задач задания")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = TicketResponse.class))})})
+	@GetMapping("/ticket/{ticketId}/child")
+	public ResponseEntity<List<TicketResponse>> getChildTickets(@AuthenticationPrincipal JwtUser currentUser,
+																@PathVariable UUID ticketId
+	) {
+		return new ResponseEntity<>(
+				ticketMapper.convert(ticketService.findChildTickets(ticketId)),
+				HttpStatus.OK);
+	}
+
 	@Operation(summary = "Получение всех заданий из проекта")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
@@ -55,8 +72,8 @@ public class TicketEndpoint {
 							schema = @Schema(implementation = TicketResponse.class))})})
 	@GetMapping("/project/{projectId}/ticket/{ticketId}")
 	public ResponseEntity<TicketResponse> getTicketFromProjectById(@AuthenticationPrincipal JwtUser currentUser,
-																		 @PathVariable UUID projectId,
-																		 @PathVariable UUID ticketId
+																   @PathVariable UUID projectId,
+																   @PathVariable UUID ticketId
 	) {
 		return new ResponseEntity<>(
 				ticketMapper.convert(ticketService.findTicketFromProjectById(projectId, ticketId)),
@@ -105,5 +122,35 @@ public class TicketEndpoint {
 	@DeleteMapping("/ticket/delete/{id}")
 	public void delete(@PathVariable UUID id) {
 		ticketService.delete(id);
+	}
+
+	@Operation(summary = "Получение всех типов задач")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = TicketResponse.class))})})
+	@GetMapping("/ticket/getTicketTypes")
+	public ResponseEntity<TicketType[]> getTicketTypes(@AuthenticationPrincipal JwtUser currentUser) {
+		return new ResponseEntity<>(TicketType.values(), HttpStatus.OK);
+	}
+
+	@Operation(summary = "Получение всех статусов задач")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = TicketResponse.class))})})
+	@GetMapping("/ticket/getTicketStatuses")
+	public ResponseEntity<TicketStatus[]> getTicketStatuses(@AuthenticationPrincipal JwtUser currentUser) {
+		return new ResponseEntity<>(TicketStatus.values(), HttpStatus.OK);
+	}
+
+	@Operation(summary = "Получение всех приоритетов задач")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = TicketResponse.class))})})
+	@GetMapping("/ticket/getTicketPriorities")
+	public ResponseEntity<TicketPriority[]> getTicketPriorities(@AuthenticationPrincipal JwtUser currentUser) {
+		return new ResponseEntity<>(TicketPriority.values(), HttpStatus.OK);
 	}
 }

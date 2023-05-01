@@ -2,6 +2,7 @@ package inc.mischief.mischief.service;
 
 import inc.mischief.mischief.domain.Ticket;
 import inc.mischief.mischief.domain.User;
+import inc.mischief.mischief.domain.enumeration.ticket.TicketStatus;
 import inc.mischief.mischief.mapper.TicketMapper;
 import inc.mischief.mischief.repositories.TicketRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,10 @@ public class TicketService {
 		return ticketRepository.findAllByRelatedProjectId(projectId);
 	}
 
+	public List<Ticket> findChildTickets(UUID parentTicket) {
+		return ticketRepository.findByParentTicketId(parentTicket);
+	}
+
 	@Transactional
 	public Ticket create(Ticket createdTicket, User creator) {
 		createdTicket.setReporter(creator);
@@ -40,6 +47,15 @@ public class TicketService {
 	public Ticket update(Ticket updatedTicket) {
 
 		var ticket = ticketRepository.findById(updatedTicket.getId()).orElseThrow(EntityNotFoundException::new);
+
+		var availableStatuses = ticket.getStatus().getAvailableStatuses()
+				.stream()
+				.map(TicketStatus::valueOf)
+				.collect(Collectors.toSet());
+
+		if (!availableStatuses.contains(updatedTicket.getStatus())) {
+			throw new IllegalArgumentException("That status is not available: %s".formatted(updatedTicket.getStatus()));
+		}
 
 		ticketMapper.update(ticket, updatedTicket);
 

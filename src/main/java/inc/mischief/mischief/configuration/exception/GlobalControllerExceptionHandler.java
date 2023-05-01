@@ -55,6 +55,12 @@ public class GlobalControllerExceptionHandler {
 		return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<Map<String, List<String>>> handleStatusErrors(IllegalArgumentException ex) {
+		var exMessage = "%s: %s".formatted(ex.getClass(), ex.getMessage());
+		return new ResponseEntity<>(getErrorsMap(List.of(exMessage)), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+	}
+
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<Map<String, List<String>>> handleValidationErrors(HttpMessageNotReadableException ex) {
 		var exMessage = "%s: %s".formatted(ex.getLocalizedMessage(), ex.getRootCause());
