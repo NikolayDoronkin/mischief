@@ -61,9 +61,10 @@ public class User extends GenericEntity {
 			name = "user_m2m_comment",
 			joinColumns = @JoinColumn(name = "fk_user"),
 			inverseJoinColumns = @JoinColumn(name = "fk_comment"))
-	@ToString.Exclude
 	private Set<Comment> comments;
 
+//	@ManyToMany(mappedBy = "receiver")
+//	private Set<Notification> notifications;
 
 	@PrePersist
 	public void setupFields() {

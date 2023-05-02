@@ -18,8 +18,8 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class Notification extends GenericEntity {
 
-	@Column(updatable = false, insertable = false)
-	private NotificationTemplate template; //- Шаблон уведомления
+	@Column(updatable = false)
+	private String template; //- Шаблон уведомления
 
 	@ManyToOne
 	@JoinColumn(name = "fk_author")
@@ -28,8 +28,8 @@ public class Notification extends GenericEntity {
 	@ManyToMany
 	@JoinTable(
 			name = "user_m2m_notification",
-			joinColumns = @JoinColumn(name = "fk_notification"),
-			inverseJoinColumns = @JoinColumn(name = "fk_user"))
+			joinColumns = @JoinColumn(name = "fk_notification", referencedColumnName = "id"),
+			inverseJoinColumns = @JoinColumn(name = "fk_user", referencedColumnName = "id"))
 	private Set<User> receiver;
 
 	@Column(name = "fk_related_ticket", nullable = false, insertable = false, updatable = false)
@@ -41,4 +41,16 @@ public class Notification extends GenericEntity {
 
 	@Column(nullable = false, updatable = false, insertable = false)
 	private LocalDate created; //- Дата создания
+
+	private LocalDate viewed;
+
+	@PrePersist
+	public void setupFields() {
+		this.created = LocalDate.now();
+	}
+
+	public void setRelatedTicket(Ticket relatedTicket) {
+		this.relatedTicket = relatedTicket;
+		this.relatedTicketId = relatedTicket != null ? relatedTicket.getId() : null;
+	}
 }

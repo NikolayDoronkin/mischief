@@ -12,10 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +45,18 @@ public class TicketService {
 			createdTicket.setStarted(LocalDate.now());
 		}
 
-		return ticketRepository.save(createdTicket);
+		var savedTicket = ticketRepository.save(createdTicket);
+
+		return ticketRepository.save(updateListeners(savedTicket));
+	}
+
+	private Ticket updateListeners(Ticket savedTicket) {
+		var newListeners = Stream.of(savedTicket.getReporter(), savedTicket.getAssignee(), savedTicket.getReviewer())
+				.filter(Objects::nonNull)
+				.toList();
+		savedTicket.getListeners().addAll(newListeners);
+
+		return savedTicket;
 	}
 
 	public Ticket update(Ticket updatedTicket) {

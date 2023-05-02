@@ -58,7 +58,7 @@ create table if not exists user_m2m_ticket_listener
 create table if not exists notification
 (
     id                                uuid                    primary key,
-    template                          varchar(20)             not null,
+    template                          varchar(100)            not null,
     fk_author                         uuid                                    references "user"(id),
     fk_related_ticket                 uuid                    not null        references ticket(id),
     created                           timestamp               not null        default now()

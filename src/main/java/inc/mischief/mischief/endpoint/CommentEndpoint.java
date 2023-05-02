@@ -26,7 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/comment")
 @SecurityRequirement(name = "Bearer Authentication")
-@Tag(name = "Project", description = "Эндпоинты для работы с проектами")
+@Tag(name = "Comment", description = "Эндпоинты для работы с комментариями")
 public class CommentEndpoint {
 
 	private final CommentMapper commentMapper;
