@@ -1,6 +1,7 @@
 package inc.mischief.mischief.repositories;
 
 import inc.mischief.mischief.domain.Project;
+import inc.mischief.mischief.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,8 @@ import java.util.UUID;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
 	Project findProjectByName(String name);
+
+	List<Project> findAllByUsersContains(User user);
 
 	@Query(value = """
 			select id from project

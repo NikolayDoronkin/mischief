@@ -82,7 +82,7 @@ public class UserEndpoint {
 	}
 
 	@SecurityRequirement(name = "Bearer Authentication")
-	@Operation(summary = "Создать клиента")
+	@Operation(summary = "Обновить клиента")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "User created",
 					content = {@Content(mediaType = "application/json",

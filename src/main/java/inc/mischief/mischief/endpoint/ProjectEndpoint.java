@@ -1,7 +1,6 @@
 package inc.mischief.mischief.endpoint;
 
 import inc.mischief.mischief.configuration.jwt.JwtUser;
-import inc.mischief.mischief.domain.User;
 import inc.mischief.mischief.mapper.ProjectMapper;
 import inc.mischief.mischief.mapper.UserMapper;
 import inc.mischief.mischief.model.request.project.CreateProjectRequest;
@@ -48,8 +47,8 @@ public class ProjectEndpoint {
 					content = {@Content(mediaType = "application/json",
 							schema = @Schema(implementation = ProjectResponse.class))})})
 	@GetMapping("/{id}/statistics")
-	public ResponseEntity<Map<User, Double>> getStatistics(@AuthenticationPrincipal JwtUser currentUser,
-														   @PathVariable UUID id) {
+	public ResponseEntity<List<Map<String, Object>>> getStatistics(@AuthenticationPrincipal JwtUser currentUser,
+															 @PathVariable UUID id) {
 		return new ResponseEntity<>(projectService.getStatistics(id), HttpStatus.OK);
 	}
 
@@ -77,7 +76,7 @@ public class ProjectEndpoint {
 				HttpStatus.OK);
 	}
 
-	@Operation(summary = "Создать клиента")
+	@Operation(summary = "Поиск проекта по идентификатору")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
 					content = {@Content(mediaType = "application/json",
@@ -103,8 +102,7 @@ public class ProjectEndpoint {
 				HttpStatus.OK);
 	}
 
-
-	@Operation(summary = "Создать клиента")
+	@Operation(summary = "Создать проект")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "User created",
 					content = {@Content(mediaType = "application/json",
@@ -119,7 +117,7 @@ public class ProjectEndpoint {
 				HttpStatus.CREATED);
 	}
 
-	@Operation(summary = "Создать клиента")
+	@Operation(summary = "Обновить проект")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "User created",
 					content = {@Content(mediaType = "application/json",
@@ -149,5 +147,26 @@ public class ProjectEndpoint {
 	@PostMapping("/delete/{projectId}/delete/{userId}")
 	public void delete(@PathVariable UUID projectId, @PathVariable UUID userId) {
 		projectService.deleteUserFromProject(projectId, userId);
+	}
+
+	@Operation(summary = "Получить статистику по проектам")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = ProjectResponse.class))})})
+	@GetMapping("/getDashboard")
+	public ResponseEntity<Map<String, Object>> getDashboard(@AuthenticationPrincipal JwtUser user) {
+		return new ResponseEntity<>(projectService.getDashboard(user.getUser()), HttpStatus.OK);
+	}
+
+	@Operation(summary = "Получить статистику по проекту")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					content = {@Content(mediaType = "application/json",
+							schema = @Schema(implementation = ProjectResponse.class))})})
+	@GetMapping("/{projectId}/getDashboardForProject")
+	public ResponseEntity<Map<String, Object>> getDashboardForProject(@PathVariable UUID projectId,
+																	  @AuthenticationPrincipal JwtUser user) {
+		return new ResponseEntity<>(projectService.getProjectDashboard(user.getUser(), projectId), HttpStatus.OK);
 	}
 }

@@ -16,7 +16,6 @@ public class SecurityConfiguration {
 
 	private final JwtUtils jwtUtils;
 
-	//FIXME добавить свои списки
 	private static final String[] AUTH_WHITELIST = {
 			"/authenticate",
 			"/swagger-resources/**",

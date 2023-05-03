@@ -127,4 +127,9 @@ public class Ticket extends GenericEntity {
 	public void setupFields() {
 		this.created = LocalDate.now();
 	}
+
+	@PreUpdate
+	public void updateFields() {
+		this.updated = LocalDate.now();
+	}
 }

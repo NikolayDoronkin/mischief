@@ -1,6 +1,5 @@
 package inc.mischief.mischief.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import inc.mischief.mischief.domain.enumeration.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,28 +42,12 @@ public class User extends GenericEntity {
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
 
-	/*@OneToMany(mappedBy = "creator", fetch = FetchType.EAGER)
-	@JsonIgnore
-	private Set<Project> creatorProjects;
-
-	@ManyToMany(mappedBy = "users")
-	private Set<Project> accessedProjects;
-
-	@ManyToMany(mappedBy = "accessableUsers")
-	private Set<Ticket> accessToTicketUser;
-
-	@ManyToMany(mappedBy = "listeners")
-	private Set<Ticket> listenerToTicketUsers;*/
-
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "user_m2m_comment",
 			joinColumns = @JoinColumn(name = "fk_user"),
 			inverseJoinColumns = @JoinColumn(name = "fk_comment"))
 	private Set<Comment> comments;
-
-//	@ManyToMany(mappedBy = "receiver")
-//	private Set<Notification> notifications;
 
 	@PrePersist
 	public void setupFields() {
