@@ -20,5 +20,11 @@ public class UserResponse {
 	private LocalDate created;
 	private LocalDate deleted;
 	private UserRole userRole;
+	private String description;
+	private String address;
+	private String city;
+	private String country;
+	private String image;
+	private String email;
 	private Set<ProjectResponse> creatorProjects;
 }

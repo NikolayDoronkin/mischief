@@ -42,6 +42,13 @@ public class User extends GenericEntity {
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
 
+	private String description;
+	private String address;
+	private String city;
+	private String country;
+	private String image;
+	private String email;
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "user_m2m_comment",

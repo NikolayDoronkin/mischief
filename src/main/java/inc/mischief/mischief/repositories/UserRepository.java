@@ -12,6 +12,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 	User findByLogin(String login);
+	User findByLoginAndIdIsNot(String login, UUID id);
 	User findByFirstName(String firstName);
 	List<User> findByDeletedIsNullOrderByLastName();
 	Set<User> findByIdIn(Collection<UUID> ids);

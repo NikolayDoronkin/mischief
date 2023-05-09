@@ -12,12 +12,6 @@ import lombok.*;
 public class CreateUserRequest extends AbstractUserRequest {
 
 	@NotNull
-	private String firstName;
-
-	@NotNull
-	private String lastName;
-
-	@NotNull
 	private String password;
 
 	@NotNull

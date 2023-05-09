@@ -51,7 +51,7 @@ public class UserService {
 	}
 
 	public User update(User updatedUser) {
-		checkExisting(userRepository.findByLogin(updatedUser.getLogin()),
+		checkExisting(userRepository.findByLoginAndIdIsNot(updatedUser.getLogin(), updatedUser.getId()),
 				"User with this login already exists!");
 
 		var user = userRepository.findById(updatedUser.getId()).orElseThrow(EntityNotFoundException::new);
