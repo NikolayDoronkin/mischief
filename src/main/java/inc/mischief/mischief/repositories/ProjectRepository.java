@@ -2,6 +2,9 @@ package inc.mischief.mischief.repositories;
 
 import inc.mischief.mischief.domain.Project;
 import inc.mischief.mischief.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -23,7 +26,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 			""", nativeQuery = true)
 	List<UUID> findAllForUserByAccess(UUID userId);
 
-	List<Project> findAllByIdIn(Collection<UUID> projectIds);
+	PageImpl<Project> findAllByIdIn(Collection<UUID> projectIds, Pageable pageable);
 
 	@Query(value = """
 			select um2mp.fk_user from user_m2m_project um2mp

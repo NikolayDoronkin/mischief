@@ -18,6 +18,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -95,10 +99,10 @@ public class ProjectEndpoint {
 					content = {@Content(mediaType = "application/json",
 							schema = @Schema(implementation = ProjectResponse.class))})})
 	@GetMapping("/findByCreatorId/{id}")
-	public ResponseEntity<List<ProjectResponse>> findByCreatorId(@AuthenticationPrincipal JwtUser currentUser,
-																 @PathVariable UUID id) {
+	public ResponseEntity<Page<ProjectResponse>> findByCreatorId(@AuthenticationPrincipal JwtUser currentUser,
+																 @PathVariable UUID id, @ParameterObject Pageable pageable) {
 		return new ResponseEntity<>(
-				projectMapper.convert(projectService.findAllForUserWithAccess(id)),
+				projectMapper.convert(projectService.findAllForUserWithAccess(id, pageable)),
 				HttpStatus.OK);
 	}
 

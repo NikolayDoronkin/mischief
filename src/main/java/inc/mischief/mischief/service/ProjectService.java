@@ -13,7 +13,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.ObjectDeletedException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -186,8 +189,8 @@ public class ProjectService {
 				.orElseThrow(EntityNotFoundException::new);
 	}
 
-	public List<Project> findAllForUserWithAccess(UUID userId) {
-		return projectRepository.findAllByIdIn(projectRepository.findAllForUserByAccess(userId));
+	public PageImpl<Project> findAllForUserWithAccess(UUID userId, Pageable pageable) {
+		return projectRepository.findAllByIdIn(projectRepository.findAllForUserByAccess(userId), pageable);
 	}
 
 	@Transactional
