@@ -55,8 +55,11 @@ public class TicketService {
 	private Ticket updateListeners(Ticket savedTicket) {
 		var newListeners = Stream.of(savedTicket.getReporter(), savedTicket.getAssignee(), savedTicket.getReviewer())
 				.filter(Objects::nonNull)
-				.toList();
-		savedTicket.getListeners().addAll(newListeners);
+				.collect(Collectors.toSet());
+
+		var updatedListeners = new HashSet<>(savedTicket.getListeners());
+		updatedListeners.addAll(newListeners);
+		savedTicket.setListeners(updatedListeners);
 
 		return savedTicket;
 	}

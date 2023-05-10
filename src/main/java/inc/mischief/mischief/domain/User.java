@@ -17,7 +17,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "\"user\"")
-@ToString
 public class User extends GenericEntity {
 
 	@Column(name = "first_name", nullable = false)
@@ -49,7 +48,7 @@ public class User extends GenericEntity {
 	private String image;
 	private String email;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "user_m2m_comment",
 			joinColumns = @JoinColumn(name = "fk_user"),
