@@ -8,6 +8,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -63,9 +64,9 @@ public class Ticket extends GenericEntity {
 	@Column(name = "fk_related_project", nullable = false)
 	private UUID relatedProjectId;
 
-	private LocalDate started;
+	private LocalDateTime started;
 
-	private LocalDate finished;
+	private LocalDateTime finished;
 
 	private long duration;
 

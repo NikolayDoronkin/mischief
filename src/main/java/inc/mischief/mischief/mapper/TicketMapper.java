@@ -1,10 +1,8 @@
 package inc.mischief.mischief.mapper;
 
-import inc.mischief.mischief.domain.Project;
 import inc.mischief.mischief.domain.Ticket;
 import inc.mischief.mischief.model.request.ticket.CreateTicketRequest;
 import inc.mischief.mischief.model.request.ticket.UpdateTicketRequest;
-import inc.mischief.mischief.model.response.project.ProjectResponse;
 import inc.mischief.mischief.model.response.ticket.TicketResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -33,5 +31,8 @@ public interface TicketMapper {
 		return new PageImpl<>(responses, tickets.getPageable(), tickets.getTotalElements());
 	}
 
+	@Mapping(target = "reviewerId", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
+	@Mapping(target = "assigneeId", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
+	@Mapping(target = "relatableFinishedDate", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
 	void update(@MappingTarget Ticket updatedProject, Ticket userFromRequest);
 }

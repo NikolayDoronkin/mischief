@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,7 +45,7 @@ public class TicketService {
 		createdTicket.setNumber(++maxNumberFromProject);
 
 		if (createdTicket.getStatus() == TicketStatus.IN_PROGRESS) {
-			createdTicket.setStarted(LocalDate.now());
+			createdTicket.setStarted(LocalDateTime.now());
 		}
 
 		var savedTicket = ticketRepository.save(createdTicket);
@@ -68,13 +69,15 @@ public class TicketService {
 
 		var ticket = ticketRepository.findById(updatedTicket.getId()).orElseThrow(EntityNotFoundException::new);
 
-		var availableStatuses = ticket.getStatus().getAvailableStatuses()
-				.stream()
-				.map(TicketStatus::valueOf)
-				.collect(Collectors.toSet());
+		if (updatedTicket.getStatus() != ticket.getStatus()) {
+			var availableStatuses = ticket.getStatus().getAvailableStatuses()
+					.stream()
+					.map(TicketStatus::valueOf)
+					.collect(Collectors.toSet());
 
-		if (!availableStatuses.contains(updatedTicket.getStatus())) {
-			throw new IllegalArgumentException("That status is not available: %s".formatted(updatedTicket.getStatus()));
+			if (!availableStatuses.contains(updatedTicket.getStatus())) {
+				throw new IllegalArgumentException("That status is not available: %s".formatted(updatedTicket.getStatus()));
+			}
 		}
 
 		checkDuration(ticket, updatedTicket);
@@ -89,11 +92,11 @@ public class TicketService {
 		var nextStatus = updatedTicket.getStatus();
 
 		if (currentStatus == TicketStatus.IN_PROGRESS && nextStatus == TicketStatus.DONE) {
-			ticket.setFinished(LocalDate.now());
+			ticket.setFinished(LocalDateTime.now());
 			ticket.setDuration(Duration.between(ticket.getStarted(), ticket.getFinished()).toDays());
-		}
-		else if (currentStatus != TicketStatus.IN_PROGRESS && nextStatus == TicketStatus.IN_PROGRESS) {
-			ticket.setDuration(ticket.getDuration() + Duration.between(ticket.getStarted(), LocalDate.now()).toDays());
+		} else if (currentStatus != TicketStatus.IN_PROGRESS && nextStatus == TicketStatus.IN_PROGRESS) {
+			ticket.setStarted(Optional.ofNullable(ticket.getStarted()).orElse(LocalDateTime.now()));
+			ticket.setDuration(ticket.getDuration() + Duration.between(ticket.getStarted(), LocalDateTime.now()).toDays());
 		}
 	}
 
