@@ -1,13 +1,16 @@
 package inc.mischief.mischief.mapper;
 
+import inc.mischief.mischief.domain.Project;
 import inc.mischief.mischief.domain.Ticket;
 import inc.mischief.mischief.model.request.ticket.CreateTicketRequest;
 import inc.mischief.mischief.model.request.ticket.UpdateTicketRequest;
+import inc.mischief.mischief.model.response.project.ProjectResponse;
 import inc.mischief.mischief.model.response.ticket.TicketResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 
@@ -22,6 +25,13 @@ public interface TicketMapper {
 
 	TicketResponse convert(Ticket user);
 	List<TicketResponse> convert(List<Ticket> users);
+
+	default PageImpl<TicketResponse> convert(PageImpl<Ticket> tickets) {
+		var responses = tickets.stream()
+				.map(this::convert)
+				.toList();
+		return new PageImpl<>(responses, tickets.getPageable(), tickets.getTotalElements());
+	}
 
 	void update(@MappingTarget Ticket updatedProject, Ticket userFromRequest);
 }

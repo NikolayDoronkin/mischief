@@ -27,7 +27,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -62,9 +61,9 @@ public class ProjectEndpoint {
 					content = {@Content(mediaType = "application/json",
 							schema = @Schema(implementation = ProjectResponse.class))})})
 	@GetMapping("/{id}/members")
-	public ResponseEntity<Collection<UserResponse>> getMembers(@AuthenticationPrincipal JwtUser currentUser,
-															   @PathVariable UUID id) {
-		return new ResponseEntity<>(userMapper.convert(projectService.getMembersFromProject(id)), HttpStatus.OK);
+	public ResponseEntity<PageImpl<UserResponse>> getMembers(@AuthenticationPrincipal JwtUser currentUser,
+															   @PathVariable UUID id, @ParameterObject Pageable pageable) {
+		return new ResponseEntity<>(userMapper.convert(projectService.getMembersFromProject(id, pageable)), HttpStatus.OK);
 	}
 
 	@Operation(summary = "Создать клиента")
@@ -115,7 +114,7 @@ public class ProjectEndpoint {
 	public ResponseEntity<ProjectResponse> create(@AuthenticationPrincipal JwtUser currentUser,
 												  @Valid @RequestBody CreateProjectRequest request) {
 		var convert = projectMapper.convert(request);
-		convert.setUsers(userService.findByIds(request.getAccessedUserIds()));
+		convert.setUsers(userService.findByIds(request.getAccessedUserIds(), Pageable.unpaged()).toSet());
 		return new ResponseEntity<>(
 				projectMapper.convert(projectService.create(convert, currentUser.getUser())),
 				HttpStatus.CREATED);

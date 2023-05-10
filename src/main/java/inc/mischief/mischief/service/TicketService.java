@@ -8,6 +8,8 @@ import inc.mischief.mischief.repositories.TicketRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -27,8 +29,8 @@ public class TicketService {
 		return ticketRepository.findTicketByRelatedProjectIdAndId(projectId, ticketId);
 	}
 
-	public List<Ticket> findTicketsFromProject(UUID projectId) {
-		return ticketRepository.findAllByRelatedProjectId(projectId);
+	public PageImpl<Ticket> findTicketsFromProject(UUID projectId, Pageable pageable) {
+		return ticketRepository.findAllByRelatedProjectId(projectId, pageable);
 	}
 
 	public List<Ticket> findChildTickets(UUID parentTicket) {

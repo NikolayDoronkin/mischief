@@ -19,6 +19,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,10 +47,10 @@ public class TicketEndpoint {
 					content = {@Content(mediaType = "application/json",
 							schema = @Schema(implementation = TicketResponse.class))})})
 	@GetMapping("/project/{projectId}/ticket")
-	public ResponseEntity<List<TicketResponse>> getTicketsFromProject(@AuthenticationPrincipal JwtUser currentUser,
-																	  @PathVariable UUID projectId) {
+	public ResponseEntity<PageImpl<TicketResponse>> getTicketsFromProject(@AuthenticationPrincipal JwtUser currentUser,
+																		  @PathVariable UUID projectId, @ParameterObject Pageable pageable) {
 		return new ResponseEntity<>(
-				ticketMapper.convert(ticketService.findTicketsFromProject(projectId)),
+				ticketMapper.convert(ticketService.findTicketsFromProject(projectId, pageable)),
 				HttpStatus.CREATED);
 	}
 
@@ -90,12 +93,12 @@ public class TicketEndpoint {
 												 @PathVariable UUID projectId,
 												 @Valid @RequestBody CreateTicketRequest request) {
 
-		var accessedUsers = userService.findByIds(request.getAccessedUserIds());
-		var listeners = userService.findByIds(request.getListenerIds());
+		var accessedUsers = userService.findByIds(request.getAccessedUserIds(), Pageable.unpaged());
+		var listeners = userService.findByIds(request.getListenerIds(), Pageable.unpaged());
 
 		var ticket = ticketMapper.convert(request);
-		ticket.setAccessableUsers(accessedUsers);
-		ticket.setListeners(listeners);
+		ticket.setAccessableUsers(accessedUsers.toSet());
+		ticket.setListeners(listeners.toSet());
 
 		return new ResponseEntity<>(
 				ticketMapper.convert(ticketService.create(ticket, currentUser.getUser())),

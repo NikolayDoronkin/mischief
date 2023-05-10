@@ -13,7 +13,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.ObjectDeletedException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +42,7 @@ public class ProjectService {
 		var result = new HashMap<String, Object>();
 
 //		TOTAL TICKETS FROM PROJECT
-		var ticketsFromProject = ticketService.findTicketsFromProject(projectId);
+		var ticketsFromProject = ticketService.findTicketsFromProject(projectId, Pageable.unpaged());
 
 //		Карточки
 //		---------------------------------------------------------------------------------------------------
@@ -80,12 +79,12 @@ public class ProjectService {
 				.limit(5)
 				.toList();
 //		--------------------------------------------------------------------------------------------------
-		result.put("totalTicketsFromProject", ticketsFromProject.size());
+		result.put("totalTicketsFromProject", ticketsFromProject.getTotalElements());
 		result.put("done", done.size());
 		result.put("inProgress", inProgress.size());
 		result.put("onReview", onReview.size());
 
-		result.put("lastUpdatedTickets", ticketMapper.convert(ticketsFromProject));
+		result.put("lastUpdatedTickets", ticketMapper.convert(lastUpdatedTickets));
 
 		return result;
 	}
@@ -154,14 +153,14 @@ public class ProjectService {
 				.ifPresent(users::remove);
 	}
 
-	public Collection<User> getMembersFromProject(UUID projectId) {
-		return userService.findByIds(projectRepository.findUserIds(projectId));
+	public PageImpl<User> getMembersFromProject(UUID projectId, Pageable pageable) {
+		return userService.findByIds(projectRepository.findUserIds(projectId), pageable);
 	}
 
 	public List<Map<String, Object>> getStatistics(UUID projectId) {
 		var resultStatistics = new ArrayList<Map<String, Object>>();
 
-		Map<User, Set<Ticket>> userTickets = ticketService.findTicketsFromProject(projectId)
+		Map<User, Set<Ticket>> userTickets = ticketService.findTicketsFromProject(projectId, Pageable.unpaged())
 				.stream()
 				.filter(ticket -> ticket.getStatus() == TicketStatus.DONE)
 				.collect(Collectors.groupingBy(Ticket::getAssignee, Collectors.toSet()));

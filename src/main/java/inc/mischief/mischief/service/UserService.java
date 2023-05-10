@@ -9,6 +9,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.ObjectDeletedException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,12 +30,12 @@ public class UserService {
 				.toList();
 	}
 
-	public Set<User> findByIds(Collection<UUID> ids) {
-		return userRepository.findByIdIn(ids);
+	public PageImpl<User> findByIds(Collection<UUID> ids, Pageable pageable) {
+		return userRepository.findByIdIn(ids, pageable);
 	}
 
 	public User findById(UUID id) {
-		return userRepository.findByIdIn(Collections.singleton(id))
+		return userRepository.findByIdIn(Collections.singleton(id), Pageable.unpaged())
 				.stream()
 				.findFirst()
 				.orElseThrow(EntityExistsException::new);

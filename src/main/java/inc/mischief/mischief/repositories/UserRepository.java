@@ -1,6 +1,8 @@
 package inc.mischief.mischief.repositories;
 
 import inc.mischief.mischief.domain.User;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,5 +17,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 	User findByLoginAndIdIsNot(String login, UUID id);
 	User findByFirstName(String firstName);
 	List<User> findByDeletedIsNullOrderByLastName();
-	Set<User> findByIdIn(Collection<UUID> ids);
+	PageImpl<User> findByIdIn(Collection<UUID> ids, Pageable pageable);
 }
