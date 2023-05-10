@@ -73,7 +73,7 @@ public class UserEndpoint {
 	public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) throws PasswordException {
 
 		if(!Objects.equals(request.getPassword(), request.getRepeatPassword())) {
-			throw new PasswordException("Пароли не совпадают. Повторите попытку");
+			throw new PasswordException("Passwords aren't equals.");
 		}
 
 		return new ResponseEntity<>(
