@@ -99,9 +99,11 @@ public class ProjectEndpoint {
 							schema = @Schema(implementation = ProjectResponse.class))})})
 	@GetMapping("/findByCreatorId/{id}")
 	public ResponseEntity<Page<ProjectResponse>> findByCreatorId(@AuthenticationPrincipal JwtUser currentUser,
-																 @PathVariable UUID id, @ParameterObject Pageable pageable) {
+																 @PathVariable UUID id,
+																 @RequestParam(required = false) String searchFilter,
+																 @ParameterObject Pageable pageable) {
 		return new ResponseEntity<>(
-				projectMapper.convert(projectService.findAllForUserWithAccess(id, pageable)),
+				projectMapper.convert(projectService.findAllForUserWithAccess(id, searchFilter, pageable)),
 				HttpStatus.OK);
 	}
 

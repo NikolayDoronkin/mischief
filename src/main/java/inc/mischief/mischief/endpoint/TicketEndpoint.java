@@ -48,9 +48,11 @@ public class TicketEndpoint {
 							schema = @Schema(implementation = TicketResponse.class))})})
 	@GetMapping("/project/{projectId}/ticket")
 	public ResponseEntity<PageImpl<TicketResponse>> getTicketsFromProject(@AuthenticationPrincipal JwtUser currentUser,
-																		  @PathVariable UUID projectId, @ParameterObject Pageable pageable) {
+																		  @PathVariable UUID projectId,
+																		  @RequestParam(required = false) String searchFilter,
+																		  @ParameterObject Pageable pageable) {
 		return new ResponseEntity<>(
-				ticketMapper.convert(ticketService.findTicketsFromProject(projectId, pageable)),
+				ticketMapper.convert(ticketService.findTicketsFromProject(projectId, pageable, searchFilter)),
 				HttpStatus.CREATED);
 	}
 

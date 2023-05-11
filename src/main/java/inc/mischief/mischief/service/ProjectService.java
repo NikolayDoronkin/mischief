@@ -12,11 +12,13 @@ import inc.mischief.mischief.repositories.TicketRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.ObjectDeletedException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,11 +40,13 @@ public class ProjectService {
 	private final UserService userService;
 	private final TicketService ticketService;
 
+	private final JdbcTemplate jdbcTemplate;
+
 	public HashMap<String, Object> getProjectDashboard(User user, UUID projectId) {
 		var result = new HashMap<String, Object>();
 
 //		TOTAL TICKETS FROM PROJECT
-		var ticketsFromProject = ticketService.findTicketsFromProject(projectId, Pageable.unpaged());
+		var ticketsFromProject = ticketService.findTicketsFromProject(projectId, Pageable.unpaged(), null);
 
 //		Карточки
 //		---------------------------------------------------------------------------------------------------
@@ -160,7 +164,7 @@ public class ProjectService {
 	public List<Map<String, Object>> getStatistics(UUID projectId) {
 		var resultStatistics = new ArrayList<Map<String, Object>>();
 
-		Map<User, Set<Ticket>> userTickets = ticketService.findTicketsFromProject(projectId, Pageable.unpaged())
+		Map<User, Set<Ticket>> userTickets = ticketService.findTicketsFromProject(projectId, Pageable.unpaged(), null)
 				.stream()
 				.filter(ticket -> ticket.getStatus() == TicketStatus.DONE)
 				.collect(Collectors.groupingBy(Ticket::getAssignee, Collectors.toSet()));
@@ -188,8 +192,24 @@ public class ProjectService {
 				.orElseThrow(EntityNotFoundException::new);
 	}
 
-	public PageImpl<Project> findAllForUserWithAccess(UUID userId, Pageable pageable) {
-		return projectRepository.findAllByIdIn(projectRepository.findAllForUserByAccess(userId), pageable);
+	public PageImpl<Project> findAllForUserWithAccess(UUID userId, String searchFilter, Pageable pageable) {
+		var ids = jdbcTemplate.queryForList("""
+				select project.id from project
+					join user_m2m_project um2mp on project.id = um2mp.fk_project
+					join "user" u 				on um2mp.fk_user = u.id
+				where um2mp.fk_user = '%s'
+				%s
+				"""
+				.formatted(userId.toString(), StringUtils.isNotBlank(searchFilter)
+						? """
+				and
+				(project.name ilike '%1$s' or
+				project.short_name ilike '%1$s' or
+				 u.first_name ilike '%1$s' or
+				 u.last_name ilike '%1$s')
+				"""
+				.formatted("%" + searchFilter + "%") : ""), UUID.class);
+		return projectRepository.findAllByIdIn(ids, pageable);
 	}
 
 	@Transactional
