@@ -157,8 +157,29 @@ public class ProjectService {
 				.ifPresent(users::remove);
 	}
 
-	public PageImpl<User> getMembersFromProject(UUID projectId, Pageable pageable) {
-		return userService.findByIds(projectRepository.findUserIds(projectId), pageable);
+	public PageImpl<User> getMembersFromProject(UUID projectId, Pageable pageable, String searchFilter) {
+		var ids = jdbcTemplate.queryForList(
+			"""
+				select um2mp.fk_user from user_m2m_project um2mp
+					join "user" u on u.id = um2mp.fk_user
+				where um2mp.fk_project = '%s'
+				%s
+			"""
+			.formatted(projectId.toString(), StringUtils.isNotBlank(searchFilter)
+					? """
+						and
+						(
+						u.first_name ilike '%1$s' or
+						u.last_name ilike '%1$s' or
+						u.login ilike '%1$s' or
+						u.email ilike '%1$s' or
+						u.country ilike '%1$s' or
+						u.city ilike '%1$s'
+						)
+						"""
+						.formatted("%" + searchFilter + "%") : ""), UUID.class);
+
+		return userService.findByIds(ids, pageable);
 	}
 
 	public List<Map<String, Object>> getStatistics(UUID projectId) {

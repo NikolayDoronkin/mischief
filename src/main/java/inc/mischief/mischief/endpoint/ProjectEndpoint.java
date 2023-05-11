@@ -62,8 +62,10 @@ public class ProjectEndpoint {
 							schema = @Schema(implementation = ProjectResponse.class))})})
 	@GetMapping("/{id}/members")
 	public ResponseEntity<PageImpl<UserResponse>> getMembers(@AuthenticationPrincipal JwtUser currentUser,
-															   @PathVariable UUID id, @ParameterObject Pageable pageable) {
-		return new ResponseEntity<>(userMapper.convert(projectService.getMembersFromProject(id, pageable)), HttpStatus.OK);
+															 @PathVariable UUID id,
+															 @RequestParam(required = false) String searchFilter,
+															 @ParameterObject Pageable pageable) {
+		return new ResponseEntity<>(userMapper.convert(projectService.getMembersFromProject(id, pageable, searchFilter)), HttpStatus.OK);
 	}
 
 	@Operation(summary = "Создать клиента")
