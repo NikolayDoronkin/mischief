@@ -39,11 +39,13 @@ public class TicketService {
                 """
                         select t.id from ticket t
                             join project p on t.fk_related_project = p.id
-                            join "user" u on u.id = t.fk_assignee
+                            %s
                         where t.fk_related_project = '%s'
                         %s
                         """
-                        .formatted(projectId.toString(), StringUtils.isNotBlank(searchFilter)
+                        .formatted(StringUtils.isNotBlank(searchFilter) ? "join \"user\" u on u.id = t.fk_assignee" : "",
+                                projectId.toString(),
+                                StringUtils.isNotBlank(searchFilter)
                                 ? """
                                     and (
                                   p.short_name ilike '%1$s' or
