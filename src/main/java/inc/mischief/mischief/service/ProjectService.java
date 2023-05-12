@@ -42,7 +42,17 @@ public class ProjectService {
 
 	private final JdbcTemplate jdbcTemplate;
 
-	public HashMap<String, Object> getProjectDashboard(User user, UUID projectId) {
+	@Transactional
+	public void addNewMembers(UUID projectId, List<UUID> userIds) {
+		var newMembers = userService.findByIds(userIds, Pageable.unpaged()).toList();
+		var project = findById(projectId);
+
+		var updatedUsers = project.getUsers();
+		updatedUsers.addAll(newMembers);
+		project.setUsers(updatedUsers);
+	}
+
+	public Map<String, Object> getProjectDashboard(User user, UUID projectId) {
 		var result = new HashMap<String, Object>();
 
 //		TOTAL TICKETS FROM PROJECT
